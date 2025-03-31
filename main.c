@@ -113,7 +113,6 @@ int main(void)
 	      UI_HandleInput();
         UI_UpdateDisplay();
         UI_HandlePlayerButton();
-        UI_DrawPlayerControls();
         HAL_Delay(20);
   }
   /* USER CODE END 3 */
