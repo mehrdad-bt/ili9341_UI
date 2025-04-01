@@ -3,11 +3,10 @@
 #include "buttons.h"
 #include "ui_core.h"
 #include "ui_settings.h"
-#include <stdbool.h>
+
 
 static MainOption current_option = MAIN_OPTION_PLAY;
-static uint32_t last_blink_time = 0;
-static bool blink_state = false;
+
 
 //BUTTON HANDLERS
 
@@ -53,7 +52,7 @@ void MainPage_Draw(void)
 {
 	
 	ILI9341_DrawString(100,20,"MAIN MENU", COLOR_WHITE, current_bg_Color, 2);
-	
+	ILI9341_DrawString(10,10,"Ver.01", COLOR_RED, current_bg_Color, 1);
 	//draw options with selection highlight
 	
 	
@@ -63,12 +62,12 @@ void MainPage_Draw(void)
 		
 		//highlight selected option
 
-		ILI9341_DrawString(60, y_pos, options[i], COLOR_WHITE, current_bg_Color, 2);
+		ILI9341_DrawString(20, y_pos, options[i], COLOR_WHITE, current_bg_Color, 2);
 
 		if(i == current_option)
 		{
 
-		ILI9341_DrawString(60, y_pos, options[i], COLOR_BLACK, COLOR_YELLOW, 2);
+		ILI9341_DrawString(20, y_pos, options[i], COLOR_BLACK, COLOR_YELLOW, 2);
 		} 
 	}
 	

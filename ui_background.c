@@ -65,7 +65,8 @@ void ColorsPage_Draw(void)
 	for(uint8_t i=0; i< COLOR_COUNT ; i++)
 	{
 		uint16_t y_pos = 50 + i * 30;
-		uint16_t text_color = (colors[i].value == COLOR_BLACK) ? COLOR_WHITE : COLOR_BLACK;
+		uint16_t text_color = colors[i].value;
+		ILI9341_DrawString(70,y_pos + 5, colors[i].name, text_color,current_bg_Color, 1);
 		
 		//highlight selected color
 		if(i == selected_index)
@@ -74,14 +75,13 @@ void ColorsPage_Draw(void)
 		ILI9341_FillRectangle(40, y_pos - 2, 240, 30, COLOR_WHITE);
 		text_color = colors[i].value;	
 			
+		//draw color name
+		ILI9341_DrawString(70,y_pos + 5, colors[i].name, text_color,COLOR_WHITE, 1);	
 		}
 		//draw color preview box
 		ILI9341_FillRectangle(45, y_pos + 2, 20, 20, colors[i].value);
 		
-		//draw color name
 
-		ILI9341_DrawString(70,y_pos + 5, colors[i].name, text_color,(i == selected_index) ? COLOR_WHITE : current_bg_Color, 1);
-		
 	}
 	//draw instructions
 	
