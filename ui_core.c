@@ -40,8 +40,23 @@ void UI_NavigateTo(PageID page)
 
 void UI_Init(void) 
 {
-//    Buttons_Init();
-    UI_NavigateTo(PAGE_MAIN);
+	
+	  current_page = PAGE_MAIN;  // Set default page
+    current_bg_Color = COLOR_BLACK;  // Default background
+    
+    // Initialize buttons (if needed)
+    // Buttons_Init();  
+    
+    // Draw the initial page (no mutex needed here if running in `main()`)
+    MainPage_Init();  // Sets up callbacks
+
+    MainPage_Draw();  // First render
+		
+	
+////    Buttons_Init();
+//	osMutexWait(RecursiveMutexHandle, osWaitForever);
+//  UI_NavigateTo(PAGE_MAIN);
+//	osMutexRelease(RecursiveMutexHandle);
 }
 
 
@@ -49,7 +64,12 @@ void UI_Init(void)
 void UI_UpdateDisplay(void) 
 {
     /* Clear screen with current background color */
-    ILI9341_FillScreen(current_bg_Color);
+    
+	  static uint16_t last_bg_color = 0;
+    if (current_bg_Color != last_bg_color) {
+        ILI9341_FillScreen(current_bg_Color);
+        last_bg_color = current_bg_Color;
+    }
     
     /* Draw the current active page */
     switch(current_page) {
@@ -71,3 +91,5 @@ void UI_UpdateDisplay(void)
             break;
     }
 }
+
+
