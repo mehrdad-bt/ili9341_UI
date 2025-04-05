@@ -8,5 +8,8 @@ typedef enum {
 }MainOption;
 
 
+
 void MainPage_Init(void);
 void MainPage_Draw(void);
+void MainPage_ButtonHandler(ButtonEventType event);
+void ledToggle(void);

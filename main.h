@@ -31,12 +31,16 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "cmsis_os.h"
+#include "queue.h"       // For queue functions
+#include "task.h"        // For ISR-safe functions
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern osMutexId_t RecursiveMutexHandle;
+extern QueueHandle_t buttonQueue;
+extern volatile uint8_t led_blink_enabled;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -57,6 +61,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LED_Pin GPIO_PIN_1
+#define LED_GPIO_Port GPIOC
 #define RESET_Pin GPIO_PIN_0
 #define RESET_GPIO_Port GPIOA
 #define DC_Pin GPIO_PIN_1

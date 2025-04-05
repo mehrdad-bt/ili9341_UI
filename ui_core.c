@@ -7,23 +7,20 @@
 #include "buttons.h"
 
 uint16_t current_bg_Color = COLOR_BLACK;  // Fixed variable name (consistent capitalization)
-static PageID current_page = PAGE_MAIN;
+PageID current_page = PAGE_MAIN;
 
 
 
-void UI_NavigateTo(PageID page)
-{
-    /* Remove the if-condition to force initialization */
-    current_page = page;  // Always update the current page
+void UI_NavigateTo(PageID page) {
+    if (current_page == page) return;  // Skip if already on the page
     
-    // Clear previous button callbacks
-    Buttons_SetHandler(NULL);
+    current_page = page;
+    Buttons_SetHandler(NULL);  // Clear old handlers
     
-    // Initialize new page (will always execute)
-    switch(page)
-    {
+    // Initialize only if not done before (optional)
+    switch(page) {
         case PAGE_MAIN: 
-            MainPage_Init(); 
+             MainPage_Init();  // Skip if already initialized in UI_Init()
             break;
         case PAGE_SETTING:
             SettingsPage_Init(); 
@@ -31,11 +28,9 @@ void UI_NavigateTo(PageID page)
         case PAGE_COLOR_SELECT: 
             ColorsPage_Init(); 
             break;
-        default:
-            break;
     }
     
-    UI_UpdateDisplay();
+    UI_UpdateDisplay();  // Will only redraw dynamic parts
 }
 
 void UI_Init(void) 
@@ -64,7 +59,7 @@ void UI_Init(void)
 void UI_UpdateDisplay(void) 
 {
     /* Clear screen with current background color */
-    
+    osMutexWait(RecursiveMutexHandle, osWaitForever);
 	  static uint16_t last_bg_color = 0;
     if (current_bg_Color != last_bg_color) {
         ILI9341_FillScreen(current_bg_Color);
@@ -90,6 +85,8 @@ void UI_UpdateDisplay(void)
             ILI9341_DrawString(10, 10, "PAGE ERROR", COLOR_RED, current_bg_Color, 2);
             break;
     }
+		osMutexRelease(RecursiveMutexHandle);
 }
+
 
 

@@ -21,7 +21,7 @@ static const ColorOption colors[] = {
 
 
 
-static void ColorsPage_ButtonHandler(ButtonEventType event)
+void ColorsPage_ButtonHandler(ButtonEventType event)
 {
 	switch(event) 
 	{

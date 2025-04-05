@@ -11,6 +11,8 @@
 #include "stdio.h"
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
+#include "cmsis_os.h"
+#include "main.h"
 
 static SPI_HandleTypeDef *hspi;
 static GPIO_TypeDef* CS_port;
@@ -92,13 +94,15 @@ void ILI9341_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1
 
 void ILI9341_FillScreen(uint16_t color)
 {
+	osMutexWait(RecursiveMutexHandle, osWaitForever);
+	
 	ILI9341_SetAddressWindow(0, 0, 319, 239);
 	for(uint32_t i = 0; i < 240*320 ; i++)
 	{
 		ILI9341_WriteData16(color); //send 16bit color data
 
 	}
-
+	osMutexRelease(RecursiveMutexHandle);
 
 
 }

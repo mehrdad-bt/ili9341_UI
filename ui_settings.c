@@ -15,10 +15,32 @@ static settingsOption current_option = SETTING_COLOR;
 
 
 
+//static void SettingsPage_ButtonHandler(ButtonEventType event) {
+//    switch(event) {
+//        case BUTTON_EVENT_UP:
+//            current_option = (current_option + 1) % SETTING_COUNT;
+//            break;
+//        case BUTTON_EVENT_DOWN:
+//            current_option = (current_option - 1 + SETTING_COUNT) % SETTING_COUNT;
+//            break;
+//        case BUTTON_EVENT_SELECT:
+//            if (current_option == SETTING_COLOR) {
+//                UI_NavigateTo(PAGE_COLOR_SELECT);  // Non-blocking
+//                return;
+//            } else {
+//                UI_NavigateTo(PAGE_MAIN);  // Non-blocking
+//                return;
+//            }
+//    }
+//    // Non-blocking redraw
+//    osMutexWait(RecursiveMutexHandle, osWaitForever);
+//    SettingsPage_Draw();  // Avoid UI_UpdateDisplay() if possible
+//    osMutexRelease(RecursiveMutexHandle);
+//}
 
 
+void SettingsPage_ButtonHandler(ButtonEventType event) {
 
-static void SettingsPage_ButtonHandler(ButtonEventType event) {
 	switch(event) {
 		case BUTTON_EVENT_UP:
 			current_option = (current_option +1 ) %SETTING_COUNT;
