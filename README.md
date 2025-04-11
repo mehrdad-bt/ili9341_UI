@@ -10,3 +10,7 @@ i also used this circuit to control speed of Fan(resistor and inductor and vdc i
 
 
 
+https://github.com/user-attachments/assets/64060d6e-a8a2-479e-b9bf-c266be93a9e5
+
+
+
