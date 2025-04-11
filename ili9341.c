@@ -11,6 +11,8 @@
 #include "stdio.h"
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
+#include "cmsis_os.h"
+#include "main.h"
 
 static SPI_HandleTypeDef *hspi;
 static GPIO_TypeDef* CS_port;
@@ -19,6 +21,15 @@ static GPIO_TypeDef* DC_port;
 static uint16_t DC_pin;
 static GPIO_TypeDef* RESET_port;
 static uint16_t RESET_pin;
+
+
+//static SPI_HandleTypeDef *hspi_touch;
+//static GPIO_TypeDef* touch_cs_port;
+//static uint16_t touch_cs_pin;
+
+
+
+
 
 
 
@@ -83,13 +94,15 @@ void ILI9341_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1
 
 void ILI9341_FillScreen(uint16_t color)
 {
+	osMutexWait(RecursiveMutexHandle, osWaitForever);
+	
 	ILI9341_SetAddressWindow(0, 0, 319, 239);
 	for(uint32_t i = 0; i < 240*320 ; i++)
 	{
 		ILI9341_WriteData16(color); //send 16bit color data
 
 	}
-
+	osMutexRelease(RecursiveMutexHandle);
 
 
 }
@@ -149,7 +162,7 @@ void ILI9341_Init(SPI_HandleTypeDef *hspi_instance, GPIO_TypeDef* CS_port_instan
 
 void ILI9341_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-	if(x>= 240 || y>=320) return;
+	if(x>= 319 || y>=239) return;
 	ILI9341_SetAddressWindow(x, y, x+1, y+1);
 	ILI9341_WriteData16(color);
 
@@ -160,9 +173,9 @@ void ILI9341_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 void ILI9341_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
     // Check bounds
-    if (x >= 240 || y >= 320) return;
-    if ((x + w - 1) >= 240) w = 240 - x;
-    if ((y + h - 1) >= 320) h = 320 - y;
+    if (x >= 319 || y >= 239) return;
+    if ((x + w - 1) >= 320) w = 320 - x;
+    if ((y + h - 1) >= 240) h = 240 - y;
 
     // Set the address window to the rectangle area
     ILI9341_SetAddressWindow(x, y, x + w - 1, y + h - 1);
@@ -353,6 +366,71 @@ void ILI9341_DrawRectangle(uint16_t x, uint16_t y,  uint16_t w,  uint16_t h,  ui
 	
 }	
 
+
+
+
+
+//void Touch_Init(SPI_HandleTypeDef *hspi_instance, GPIO_TypeDef* touch_cs_port_instance,uint16_t touch_cs_pin_instance)
+//{
+//	//initialize touch controller spi and gpio setting
+
+//	hspi_touch = hspi_instance;
+//	touch_cs_port = touch_cs_port_instance;
+//	touch_cs_pin = touch_cs_pin_instance;
+
+//	//set the touch chip select high (inactive)
+//	HAL_GPIO_WritePin(touch_cs_port, touch_cs_pin, GPIO_PIN_SET);
+
+//}
+
+
+//uint16_t Touch_Read(uint8_t command)
+//{
+//	//read touch data from touch controller
+
+//	uint8_t tx_data[3] = {command, 0x00, 0x00};
+//	uint8_t rx_data[3] = {0};
+
+//	HAL_GPIO_WritePin(touch_cs_port, touch_cs_pin, GPIO_PIN_RESET);
+//	HAL_SPI_TransmitReceive(hspi_touch, tx_data, rx_data, 3, HAL_MAX_DELAY);
+//	HAL_GPIO_WritePin(touch_cs_port, touch_cs_pin, GPIO_PIN_SET);
+
+//	return ((rx_data[1] << 8)  | rx_data[2] ) >> 3;
+
+
+
+//}
+
+//void Touch_GetCoordinates(uint16_t *x, uint16_t *y, uint16_t *z)
+//{
+//	//read x,y,z (pressure) coordinates
+
+//	*x = Touch_Read(0xD0);
+//	*y = Touch_Read(0x90);
+//	*z = Touch_Read(0xb0);
+
+
+//}
+
+
+//void Touch_Calibrate(uint16_t raw_x, uint16_t raw_y, uint16_t *display_x, uint16_t *display_y)
+//{
+//	//calibrate raw touch coordinates to display coordinates
+
+//	uint16_t raw_x_min = 100;
+//	uint16_t raw_x_max = 2000;
+//	uint16_t raw_y_min = 100;
+//	uint16_t raw_y_max = 2000;
+
+////	*display_x = raw_x;
+////	*display_y = raw_y;
+//    *display_x = (raw_x - raw_x_min) * 239 / (raw_x_max -raw_x_min);
+// 	*display_y = (raw_y - raw_y_min) * 319 / (raw_y_max -raw_y_min);
+
+////	if(*display_x >= 240) *display_x = 239;
+////	if(*display_y >= 320) *display_y = 319;
+
+//}
 
 
 

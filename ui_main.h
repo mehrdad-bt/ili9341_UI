@@ -1,0 +1,15 @@
+#pragma once
+#include "ui_core.h"
+
+typedef enum {
+	MAIN_OPTION_PLAY,
+	MAIN_OPTION_FAN,
+	MAIN_OPTION_SETTINGS
+}MainOption;
+
+
+
+void MainPage_Init(void);
+void MainPage_Draw(void);
+void MainPage_ButtonHandler(ButtonEventType event);
+void ledToggle(void);

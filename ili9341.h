@@ -77,11 +77,13 @@
 #define COLOR_RED       0xF800
 #define COLOR_GREEN     0x07E0
 #define COLOR_BLUE      0x001F
+#define COLOR_AMBER 		0xFD20
+#define COLOR_PURPLE 		0xF81F
+#define COLOR_YELLOW		0xFFE0
 
 
-
-#define ILI9341_WIDTH      240
-#define ILI9341_HEIGHT     320
+#define ILI9341_WIDTH      320
+#define ILI9341_HEIGHT     240
 
 
 
