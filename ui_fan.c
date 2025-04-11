@@ -65,7 +65,7 @@ void FanPage_Draw(void)
 {
     // Clear screen and draw titles
     ILI9341_FillScreen(current_bg_Color);
-    ILI9341_DrawString(70, 20, "FAN SPEED CONTROLL", COLOR_WHITE, current_bg_Color, 2);
+    ILI9341_DrawString(70, 20, "FAN SPEED CONTROL", COLOR_WHITE, current_bg_Color, 2);
 //    ILI9341_DrawString(10, 10, "Ver.01", COLOR_RED, current_bg_Color, 1);
 
     // Ensure FanSpeed is within 0-7 range
