@@ -52,10 +52,10 @@ SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim1;
 
-/* Definitions for UITask */
-osThreadId_t UITaskHandle;
-const osThreadAttr_t UITask_attributes = {
-  .name = "UITask",
+/* Definitions for LEDTask */
+osThreadId_t LEDTaskHandle;
+const osThreadAttr_t LEDTask_attributes = {
+  .name = "LEDTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -75,7 +75,7 @@ const osMutexAttr_t RecursiveMutex_attributes = {
 /* USER CODE BEGIN PV */
 	QueueHandle_t buttonQueue;
 	volatile uint8_t led_blink_enabled = 0;
-
+ volatile uint16_t  duty;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,7 +83,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM1_Init(void);
-void StartUITask(void *argument);
+void StartLEDTask(void *argument);
 void StartButtonTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -129,9 +129,13 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 	
-   ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
-   UI_Init();
+
+  
 	 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);  // Start PWM
+	 
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+		 ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
+		 UI_Init();
 	 buttonQueue = xQueueCreate(10, sizeof(ButtonEventType));
    if (buttonQueue == NULL) {
         Error_Handler();  // Handle allocation failure
@@ -163,8 +167,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of UITask */
-  UITaskHandle = osThreadNew(StartUITask, NULL, &UITask_attributes);
+  /* creation of LEDTask */
+  LEDTaskHandle = osThreadNew(StartLEDTask, NULL, &LEDTask_attributes);
 
   /* creation of ButtonTask */
   ButtonTaskHandle = osThreadNew(StartButtonTask, NULL, &ButtonTask_attributes);
@@ -184,13 +188,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
+		
         HAL_Delay(20);
+		
   }
   /* USER CODE END 3 */
 }
@@ -300,9 +308,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 167+1;
+  htim1.Init.Prescaler = 168-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 199;
+  htim1.Init.Period = 200-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -325,7 +333,7 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.OCMode = TIM_OCMODE_PWM2;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
@@ -381,7 +389,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
@@ -432,19 +440,20 @@ osMutexWait(RecursiveMutexHandle, osWaitForever);
 	
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartUITask */
+/* USER CODE BEGIN Header_StartLEDTask */
 /**
-  * @brief  Function implementing the UITask thread.
+  * @brief  Function implementing the LEDTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartUITask */
-void StartUITask(void *argument)
+/* USER CODE END Header_StartLEDTask */
+void StartLEDTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
 
     for (;;) {
+			
 		 if (led_blink_enabled) {
 			 for(uint8_t i=0;i<20;i++)
 			 {
@@ -455,9 +464,10 @@ void StartUITask(void *argument)
         } else {
             osDelay(100);  // Low-power wait
     }
-  /* USER CODE END 5 */
-}
+				}
 		}
+  /* USER CODE END 5 */
+
 
 /* USER CODE BEGIN Header_StartButtonTask */
 /**
