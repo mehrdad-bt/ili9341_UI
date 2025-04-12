@@ -7,7 +7,7 @@
 #include "main.h"
 
 
-#define DUTY_STEP 30
+#define DUTY_STEP 20
 
 extern TIM_HandleTypeDef htim1;
 static uint8_t FanSpeed=0;
