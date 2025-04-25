@@ -6,6 +6,9 @@
 #include "stm32f4xx_hal.h"
 #include "buttons.h"
 #include "ui_Fan.h"
+#include "Temp.h"
+#include "oscilloscope.h"
+
 
 uint16_t current_bg_Color = COLOR_BLACK;  // Fixed variable name (consistent capitalization)
 PageID current_page = PAGE_MAIN;
@@ -22,7 +25,11 @@ void UI_NavigateTo(PageID page) {
     switch(page) {
         case PAGE_MAIN: 
              MainPage_Init();  // Skip if already initialized in UI_Init()
+						 MainPage_ForceRedraw();
             break;
+        case PAGE_OCS: 
+             OscPage_Init();  // Skip if already initialized in UI_Init()
+            break;				
 				 case PAGE_FAN: 
              FanPage_Init();  // Skip if already initialized in UI_Init()
             break;
@@ -31,6 +38,9 @@ void UI_NavigateTo(PageID page) {
             break;
         case PAGE_COLOR_SELECT: 
             ColorsPage_Init(); 
+            break;
+			  case PAGE_TEMP: 
+            TempPage_Init(); 
             break;
     }
     
@@ -63,7 +73,7 @@ void UI_Init(void)
 void UI_UpdateDisplay(void) 
 {
     /* Clear screen with current background color */
-    osMutexWait(RecursiveMutexHandle, osWaitForever);
+ //   osMutexWait(RecursiveMutexHandle, osWaitForever);
 	  static uint16_t last_bg_color = 0;
     if (current_bg_Color != last_bg_color) {
         ILI9341_FillScreen(current_bg_Color);
@@ -75,6 +85,9 @@ void UI_UpdateDisplay(void)
         case PAGE_MAIN:
             MainPage_Draw();
             break;
+        case PAGE_OCS:
+            Osc_Draw();
+            break;				
         case PAGE_FAN:
             FanPage_Draw();
             break;            
@@ -85,13 +98,15 @@ void UI_UpdateDisplay(void)
         case PAGE_COLOR_SELECT:
             ColorsPage_Draw();
             break;
-            
+        case PAGE_TEMP:
+            TempPage_Draw();
+            break;            
         default:
             /* Error state - draw warning */
             ILI9341_DrawString(10, 10, "PAGE ERROR", COLOR_RED, current_bg_Color, 2);
             break;
     }
-		osMutexRelease(RecursiveMutexHandle);
+//		osMutexRelease(RecursiveMutexHandle);
 }
 
 

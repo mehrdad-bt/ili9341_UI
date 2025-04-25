@@ -3,6 +3,10 @@
 #include "ili9341.h"
 #include "buttons.h"
 #include "ui_background.h"
+#include <stdio.h>
+#include <string.h>
+
+
 
 typedef enum {
 	
@@ -91,6 +95,10 @@ void SettingsPage_Draw(void) {
             ILI9341_DrawString(20, y_pos, options[i], COLOR_BLACK, COLOR_YELLOW, 2);
         }
     }
+		
+		
+
+
     
     // Current color preview
 //    ILI9341_FillRectangle(180, 150, 80, 40, current_bg_Color);
@@ -101,3 +109,4 @@ void SettingsPage_Draw(void) {
 //    ILI9341_DrawString(30, 220, "Press OPTION to select", COLOR_BLUE, current_bg_Color, 1);
 }
 
+		

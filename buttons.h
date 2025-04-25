@@ -2,6 +2,7 @@
 #include "stm32f4xx_hal.h"
 
 typedef enum {
+	BUTTON_EVENT_NONE,
 	BUTTON_EVENT_UP,
 	BUTTON_EVENT_DOWN,
 	BUTTON_EVENT_SELECT

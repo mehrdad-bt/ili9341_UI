@@ -28,6 +28,8 @@
 #include "ui_settings.h"
 #include "ui_background.h"
 #include "ui_Fan.h"
+#include "Temp.h"
+#include "oscilloscope.h"
 
 /* USER CODE END Includes */
 
@@ -48,9 +50,14 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+extern ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
+extern I2C_HandleTypeDef hi2c1;
+
 SPI_HandleTypeDef hspi1;
 
-TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim1;
 
 /* Definitions for LEDTask */
 osThreadId_t LEDTaskHandle;
@@ -81,8 +88,11 @@ const osMutexAttr_t RecursiveMutex_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_ADC1_Init(void);
 void StartLEDTask(void *argument);
 void StartButtonTask(void *argument);
 
@@ -125,15 +135,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
+  MX_I2C1_Init();
   MX_TIM1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 	
 
   
 	 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);  // Start PWM
-	 
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+//	 HAL_ADCEx_Calibration_Start(&hadc1);  // Calibrate ADC to remove offset errors
+//   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, ADC_BUFFER_SIZE);  // Start DMA
+	 			 __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1000);
 		 ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
 		 UI_Init();
 	 buttonQueue = xQueueCreate(10, sizeof(ButtonEventType));
@@ -250,6 +264,109 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+  ADC_InjectionConfTypeDef sConfigInjected = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configures for the selected ADC injected channel its corresponding rank in the sequencer and its sample time
+  */
+  sConfigInjected.InjectedChannel = ADC_CHANNEL_3;
+  sConfigInjected.InjectedRank = 1;
+  sConfigInjected.InjectedNbrOfConversion = 1;
+  sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_480CYCLES;
+  sConfigInjected.ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONVEDGE_NONE;
+  sConfigInjected.ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START;
+  sConfigInjected.AutoInjectedConv = DISABLE;
+  sConfigInjected.InjectedDiscontinuousConvMode = DISABLE;
+  sConfigInjected.InjectedOffset = 0;
+  if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
   * @brief SPI1 Initialization Function
   * @param None
   * @retval None
@@ -308,9 +425,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 168-1;
+  htim1.Init.Prescaler = 167+1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 200-1;
+  htim1.Init.Period = 99+1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -333,7 +450,7 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM2;
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
@@ -359,6 +476,22 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
 
@@ -389,7 +522,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
@@ -426,14 +559,14 @@ void test_led(void)
 {
 
 	
-osMutexWait(RecursiveMutexHandle, osWaitForever);
+//osMutexWait(RecursiveMutexHandle, osWaitForever);
 
 
-	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	HAL_Delay(1000);
+//	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+//	HAL_Delay(1000);
 
 
-	osMutexRelease(RecursiveMutexHandle);
+//	osMutexRelease(RecursiveMutexHandle);
 
 }	
 	
@@ -453,6 +586,30 @@ void StartLEDTask(void *argument)
   /* Infinite loop */
 
     for (;;) {
+		    Osc_InitADC();
+    
+    while(1) {
+        
+        if(current_page == PAGE_OCS) {
+//				osMutexWait(RecursiveMutexHandle, osWaitForever);
+						
+            Osc_Draw();
+//				osMutexRelease(RecursiveMutexHandle);
+        }
+        
+				else if(current_page == PAGE_TEMP){
+ //         osMutexWait(RecursiveMutexHandle, osWaitForever);
+            TempPage_Draw();
+ //       osMutexRelease(RecursiveMutexHandle);
+        }
+        
+        osDelay(50);  // Refresh at ~20Hz
+    }
+			
+			
+			
+			
+			
 			
 		 if (led_blink_enabled) {
 			 for(uint8_t i=0;i<20;i++)
@@ -488,6 +645,9 @@ void StartButtonTask(void *argument)
                 case PAGE_MAIN:
                     MainPage_ButtonHandler(event);
                     break;
+                case PAGE_OCS:
+                    Osc_ButtonHandler(event);
+                    break;								
                 case PAGE_FAN:
                     FanPage_ButtonHandler(event);
                     break;								
@@ -496,6 +656,9 @@ void StartButtonTask(void *argument)
                     break;
 								case PAGE_COLOR_SELECT:
                     ColorsPage_ButtonHandler(event);
+                    break;
+									case PAGE_TEMP:
+                    TempPage_ButtonHandler(event);
                     break;
             }
         }

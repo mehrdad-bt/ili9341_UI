@@ -432,7 +432,45 @@ void ILI9341_DrawRectangle(uint16_t x, uint16_t y,  uint16_t w,  uint16_t h,  ui
 
 //}
 
+void ILI9341_DrawWaveform(uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
+                         const uint16_t *values, uint16_t num_points, 
+                         uint16_t color, uint16_t bg_color) {
+    // Set drawing area
+    ILI9341_SetAddressWindow(x, y, x + width - 1, y + height - 1);
+    
+    // Calculate vertical scaling
+    uint16_t prev_y = height - ((values[0] * height) >> 12); // 12-bit ADC scaling
+    
+    // Draw waveform
+    for (uint16_t i = 1; i < num_points; i++) {
+        uint16_t curr_x = x + ((i * width) / num_points);
+        uint16_t curr_y = y + height - ((values[i] * height) >> 12);
+        
+        // Draw line between points
+        ILI9341_DrawLine(x + ((i-1)*width)/num_points, prev_y, 
+                        curr_x, curr_y, color);
+        
+        prev_y = curr_y;
+    }
+}
 
+void ILI9341_DrawWaveformDiff(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+                             const uint16_t *new_values, const uint16_t *old_values,
+                             uint16_t num_points, uint16_t color, uint16_t bg_color) {
+    // Only redraw changed portions of waveform
+    for (uint16_t i = 0; i < num_points; i++) {
+        uint16_t curr_x = x + ((i * width) / num_points);
+        uint16_t old_y = y + height - ((old_values[i] * height) >> 12);
+        uint16_t new_y = y + height - ((new_values[i] * height) >> 12);
+        
+        if (old_y != new_y) {
+            // Erase old point
+            ILI9341_DrawPixel(curr_x, old_y, bg_color);
+            // Draw new point
+            ILI9341_DrawPixel(curr_x, new_y, color);
+        }
+    }
+}
 
 
 

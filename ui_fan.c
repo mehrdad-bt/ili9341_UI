@@ -5,11 +5,11 @@
 #include "ui_settings.h"
 #include <stdio.h>
 #include "main.h"
+#include "ui_fan.h"
 
+#define DUTY_STEP 150
 
-#define DUTY_STEP 20
-
-extern TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim1;
 static uint8_t FanSpeed=0;
 volatile uint16_t pwm_duty=0;
 
@@ -27,7 +27,7 @@ void FanPage_ButtonHandler(ButtonEventType event)
 				break;
 			
 		case BUTTON_EVENT_DOWN:
-			pwm_duty = (pwm_duty + DUTY_STEP) > 200 ? 200 : pwm_duty + DUTY_STEP;
+			pwm_duty = (pwm_duty + DUTY_STEP) > 1000 ? 1000 : pwm_duty + DUTY_STEP;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_duty);
 			if(FanSpeed < 7) FanSpeed++;
 			UI_UpdateDisplay();
@@ -114,32 +114,4 @@ void FanPage_Draw(void)
     ILI9341_DrawString(30, 220, "Press Select To Go Back", COLOR_GREEN, current_bg_Color, 1);
 }
 
-//void FanPage_Draw(void)
-//{
-//	ILI9341_FillScreen(current_bg_Color);
-//	ILI9341_DrawString(100,20,"FAN SPEED CONTROLL", COLOR_WHITE, current_bg_Color, 2);
-//	ILI9341_DrawString(10,10,"Ver.01", COLOR_RED, current_bg_Color, 1);
-//	//draw options with selection highlight
-//	
-//	
 
-
-//		
-//		//highlight selected option
-
-//	char speedStr[4]; // Buffer for string conversion
-//	if(FanSpeed > 7) FanSpeed=7;
-//	sprintf(speedStr, "%d", FanSpeed); // Convert integer to string
-//	ILI9341_DrawString(100, 100, speedStr, COLOR_WHITE, current_bg_Color, 2);
-//	
-
-
-// 
-
-//	
-//	
-//	//Draw Instructions
-//	
-//	ILI9341_DrawString(30,200, "Use Up/Down to select", COLOR_GREEN, current_bg_Color, 1);
-//	ILI9341_DrawString(30,220, "Press Select To Confirm", COLOR_GREEN, current_bg_Color, 1);
-//}

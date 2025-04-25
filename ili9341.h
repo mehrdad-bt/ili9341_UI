@@ -80,6 +80,9 @@
 #define COLOR_AMBER 		0xFD20
 #define COLOR_PURPLE 		0xF81F
 #define COLOR_YELLOW		0xFFE0
+#define COLOR_CYAN      0x07FF
+#define COLOR_DARKGRAY      0x7BEF  // RGB565: 011110 111110 11111
+#define COLOR_YELLOW        0xFFE0  // RGB565: 111111 111110 00000
 
 
 #define ILI9341_WIDTH      320
@@ -106,7 +109,12 @@ void ILI9341_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uin
 void ILI9341_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
 void ILI9341_FillCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
 void ILI9341_DrawRectangle(uint16_t x, uint16_t y,  uint16_t w,  uint16_t h,  uint16_t color);
-
+void ILI9341_DrawWaveform(uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
+                         const uint16_t *values, uint16_t num_points, 
+                         uint16_t color, uint16_t bg_color);
+void ILI9341_DrawWaveformDiff(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+                             const uint16_t *new_values, const uint16_t *old_values,
+                             uint16_t num_points, uint16_t color, uint16_t bg_color);												 
 #endif
 
 
