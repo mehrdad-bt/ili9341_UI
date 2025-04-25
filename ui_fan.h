@@ -12,4 +12,4 @@
 void FanPage_Init(void);
 void FanPage_Draw(void);
 void FanPage_ButtonHandler(ButtonEventType event);
-
+void FanPage_ForceRedraw(void);

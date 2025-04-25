@@ -6,12 +6,16 @@
 #include <stdio.h>
 #include "main.h"
 #include "ui_fan.h"
+#include <stdbool.h>
+#include "stm32f4xx_hal.h" 
 
 #define DUTY_STEP 150
 
 TIM_HandleTypeDef htim1;
 static uint8_t FanSpeed=0;
 volatile uint16_t pwm_duty=0;
+
+static bool needs_full_redraw = true;
 
 
 //BUTTON HANDLERS
@@ -34,15 +38,10 @@ void FanPage_ButtonHandler(ButtonEventType event)
 				break;
 			
 		case BUTTON_EVENT_SELECT:
-//			if(current_option == MAIN_OPTION_SETTINGS)
-//			{
+
 				 UI_NavigateTo(PAGE_MAIN);
 		     break;
-//			}
-//			else if(current_option == MAIN_OPTION_PLAY)
-//			{
-//				 led_blink_enabled = 1;
-//			}
+
 						
 
 	
@@ -56,22 +55,28 @@ void FanPage_ButtonHandler(ButtonEventType event)
 
 void FanPage_Init(void)
 {
-//	current_option = MAIN_OPTION_PLAY;
+
 	Buttons_SetHandler(FanPage_ButtonHandler);
-	
+	needs_full_redraw = true;
+}
+
+void FanPage_ForceRedraw(void) {
+    needs_full_redraw = true;
 }
 
 void FanPage_Draw(void)
 {
+	if (needs_full_redraw){
     // Clear screen and draw titles
     ILI9341_FillScreen(current_bg_Color);
     ILI9341_DrawString(70, 20, "FAN SPEED CONTROL", COLOR_WHITE, current_bg_Color, 2);
-//    ILI9341_DrawString(10, 10, "Ver.01", COLOR_RED, current_bg_Color, 1);
+		// Draw instructions
+    ILI9341_DrawString(30, 200, "Use Up/Down to increase/Decrease", COLOR_GREEN, current_bg_Color, 1);
+    ILI9341_DrawString(30, 220, "Press Select To Go Back to Main Menu", COLOR_GREEN, current_bg_Color, 1);
+		needs_full_redraw = false;
+	}
+	
 
-    // Ensure FanSpeed is within 0-7 range
-//    if(FanSpeed > 7) FanSpeed = 7;
-//    if(FanSpeed < 0) FanSpeed = 0;
-    // Draw speed number (centered above the bar)
     char speedStr[4];
     sprintf(speedStr, "%d", FanSpeed);
     ILI9341_DrawString(140, 70, speedStr, COLOR_WHITE, current_bg_Color, 2);
@@ -104,14 +109,6 @@ void FanPage_Draw(void)
     }
 		
 		
-		
-		
-		
-		
-    
-    // Draw instructions
-    ILI9341_DrawString(30, 200, "Use Up/Down to select", COLOR_GREEN, current_bg_Color, 1);
-    ILI9341_DrawString(30, 220, "Press Select To Go Back", COLOR_GREEN, current_bg_Color, 1);
 }
 
 
