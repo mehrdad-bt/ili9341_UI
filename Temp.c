@@ -7,6 +7,9 @@
 #include "main.h"
 #include <stdbool.h>
 #include "stm32f4xx_hal.h"  
+#include "wallpapers.h"
+
+
 static uint8_t first_run = 1;
 
 typedef enum {
@@ -90,13 +93,14 @@ void TempPage_Draw(void) {
 //    static uint8_t first_run = 1;
     // Clear screen only on first run
     if(first_run==1) {
-        ILI9341_FillScreen(current_bg_Color);
-        ILI9341_DrawString(20, 20, "Temperature and Humidity", COLOR_WHITE, current_bg_Color, 2);
+			  ILI9341_DrawImage(0, 0, 320, 240, (uint16_t*)TempWallpaper);
+//        ILI9341_FillScreen(TempWallpaper);
+        ILI9341_DrawString(20, 20, "Temperature and Humidity", COLOR_BLACK, COLOR_WHITE, 2);
         first_run = 0;
-			    ILI9341_DrawString(50, 220, "Back To Main", 
-                      (current_option == SETTING_BACK) ? COLOR_BLACK : COLOR_WHITE,
-                      (current_option == SETTING_BACK) ? COLOR_YELLOW : current_bg_Color, 
-                      2);
+//			    ILI9341_DrawString(50, 220, "Back To Main", 
+//                      (current_option == SETTING_BACK) ? COLOR_BLACK : COLOR_WHITE,
+//                      (current_option == SETTING_BACK) ? COLOR_YELLOW : current_bg_Color, 
+//                      2);
     }
 
 
@@ -122,8 +126,8 @@ void TempPage_Draw(void) {
         sprintf(temp, "%02.2f C", tem);
         sprintf(humid, "%02.2f %%", hum);
         
-        ILI9341_DrawString(80, 70, temp, COLOR_YELLOW, current_bg_Color, 3);
-        ILI9341_DrawString(80, 150, humid, COLOR_CYAN, current_bg_Color, 3);
+        ILI9341_DrawString(30, 70, temp, COLOR_RED,COLOR_WHITE, 3);
+        ILI9341_DrawString(30, 150, humid, COLOR_BLUE, COLOR_WHITE, 3);
         
         last_update = HAL_GetTick();
     }
