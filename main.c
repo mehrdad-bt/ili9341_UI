@@ -61,9 +61,9 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 
 /* Definitions for LEDTask */
-osThreadId_t LEDTaskHandle;
-const osThreadAttr_t LEDTask_attributes = {
-  .name = "LEDTask",
+osThreadId_t FunctionsTaskHandle;
+const osThreadAttr_t FunctionsTask_attributes = {
+  .name = "FunctionsTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -96,7 +96,7 @@ static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
-void StartLEDTask(void *argument);
+void StartFunctionsTask(void *argument);
 void StartButtonTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -186,7 +186,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of LEDTask */
-  LEDTaskHandle = osThreadNew(StartLEDTask, NULL, &LEDTask_attributes);
+  FunctionsTaskHandle = osThreadNew(StartFunctionsTask, NULL, &FunctionsTask_attributes);
 
   /* creation of ButtonTask */
   ButtonTaskHandle = osThreadNew(StartButtonTask, NULL, &ButtonTask_attributes);
@@ -620,14 +620,14 @@ void test_led(void)
 	
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartLEDTask */
+/* USER CODE BEGIN Header_StartFunctionsTask */
 /**
   * @brief  Function implementing the LEDTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartLEDTask */
-void StartLEDTask(void *argument)
+/* USER CODE END Header_StartFunctionsTask */
+void StartFunctionsTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -651,25 +651,10 @@ void StartLEDTask(void *argument)
         }
         
         osDelay(50);  // Refresh at ~20Hz
-    }
-			
-			
-			
-			
-			
-			
-		 if (led_blink_enabled) {
-			 for(uint8_t i=0;i<20;i++)
-			 {
-            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-            osDelay(200);
-			 }
-			 	led_blink_enabled=0;
-        } else {
-            osDelay(100);  // Low-power wait
-    }
-				}
-		}
+           }     
+							
+			      }
+	}
 
 /* USER CODE BEGIN Header_StartButtonTask */
 /**
