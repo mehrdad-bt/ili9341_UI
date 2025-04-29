@@ -2,7 +2,7 @@
 #include "ui_core.h"
 #include "stm32f4xx_hal.h"  // Replace with your HAL header
 #include <stdbool.h>
-
+static bool blink_state = false;
 
 typedef enum {
 	MAIN_OPTION_OCS,

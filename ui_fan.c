@@ -9,11 +9,11 @@
 #include <stdbool.h>
 #include "stm32f4xx_hal.h" 
 
-#define DUTY_STEP 150
+#define DUTY_STEP 14
 
 TIM_HandleTypeDef htim1;
 static uint8_t FanSpeed=0;
-volatile uint16_t pwm_duty=0;
+volatile uint16_t pwm_duty=100;
 
 static bool needs_full_redraw = true;
 
@@ -23,21 +23,25 @@ void FanPage_ButtonHandler(ButtonEventType event)
 {
 	switch(event)
 	{
-		case BUTTON_EVENT_UP:
-		  pwm_duty = (pwm_duty < DUTY_STEP) ? 0 : pwm_duty - DUTY_STEP;
+		case BUTTON_EVENT_DOWN:
+
+		  pwm_duty = (pwm_duty < DUTY_STEP) ? 100 : pwm_duty - DUTY_STEP;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_duty);
-			if(FanSpeed>0) FanSpeed--;
+		if(FanSpeed < 7) FanSpeed++;
+		
+		
+			
 		  UI_UpdateDisplay();
 				break;
 			
-		case BUTTON_EVENT_DOWN:
-			pwm_duty = (pwm_duty + DUTY_STEP) > 1000 ? 1000 : pwm_duty + DUTY_STEP;
+		case BUTTON_EVENT_UP:
+			pwm_duty = (pwm_duty + DUTY_STEP) > 100 ? 100 : pwm_duty + DUTY_STEP;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_duty);
-			if(FanSpeed < 7) FanSpeed++;
+			if(FanSpeed>0) FanSpeed--;
 			UI_UpdateDisplay();
 				break;
 			
-		case BUTTON_EVENT_SELECT:
+		case BUTTON_EVENT_BACK:
 
 				 UI_NavigateTo(PAGE_MAIN);
 		     break;
@@ -71,8 +75,8 @@ void FanPage_Draw(void)
     ILI9341_FillScreen(current_bg_Color);
     ILI9341_DrawString(70, 20, "FAN SPEED CONTROL", COLOR_WHITE, current_bg_Color, 2);
 		// Draw instructions
-    ILI9341_DrawString(30, 200, "Use Up/Down to increase/Decrease", COLOR_GREEN, current_bg_Color, 1);
-    ILI9341_DrawString(30, 220, "Press Select To Go Back to Main Menu", COLOR_GREEN, current_bg_Color, 1);
+    ILI9341_DrawString(30, 200, "Use Up/Down to increase/Decrease Speed", COLOR_GREEN, current_bg_Color, 1);
+    ILI9341_DrawString(30, 220, "Press Rotary Encoder To Go Back to Main Menu", COLOR_GREEN, current_bg_Color, 1);
 		needs_full_redraw = false;
 	}
 	

@@ -54,7 +54,7 @@ void TempPage_ButtonHandler(ButtonEventType event)
 //			UI_UpdateDisplay();
 				break;
 			
-		case BUTTON_EVENT_SELECT:
+		case BUTTON_EVENT_BACK:
 			 if(current_option == SETTING_BACK)
 			{
 				 UI_NavigateTo(PAGE_MAIN);

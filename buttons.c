@@ -35,6 +35,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         else if (GPIO_Pin == GPIO_PIN_2) {
             event = BUTTON_EVENT_SELECT;
         }				
+				else if (GPIO_Pin == GPIO_PIN_11) {
+            event = BUTTON_EVENT_RIGHT;
+        }
+			  else if (GPIO_Pin == GPIO_PIN_7) {
+            event = BUTTON_EVENT_LEFT;
+        }
+		    else if (GPIO_Pin == GPIO_PIN_13) {
+            event = BUTTON_EVENT_BACK;
+        }
         else {
             return;
         }
