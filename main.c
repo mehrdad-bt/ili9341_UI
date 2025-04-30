@@ -50,13 +50,10 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-extern ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
-
-extern I2C_HandleTypeDef hi2c1;
-
 SPI_HandleTypeDef hspi1;
-
+extern ADC_HandleTypeDef hadc1;
+extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 
@@ -81,10 +78,12 @@ const osMutexAttr_t RecursiveMutex_attributes = {
   .attr_bits = osMutexRecursive,
 };
 /* USER CODE BEGIN PV */
-	QueueHandle_t buttonQueue;
-	volatile uint8_t led_blink_enabled = 0;
- volatile uint16_t  duty;
+
+QueueHandle_t buttonQueue;
+volatile uint8_t led_blink_enabled = 0;
+volatile uint16_t  duty;
 extern volatile uint8_t adc_ready;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -148,13 +147,12 @@ int main(void)
 	
 
   
-	 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);  // Start PWM
-//	 HAL_ADCEx_Calibration_Start(&hadc1);  // Calibrate ADC to remove offset errors
-//   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, ADC_BUFFER_SIZE);  // Start DMA
-	 			 __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 100);
-		 ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
-		 UI_Init();
-	 buttonQueue = xQueueCreate(10, sizeof(ButtonEventType));
+HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);  // Start PWM
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 100);
+ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
+UI_Init();
+	
+ buttonQueue = xQueueCreate(10, sizeof(ButtonEventType));
    if (buttonQueue == NULL) {
         Error_Handler();  // Handle allocation failure
     }
