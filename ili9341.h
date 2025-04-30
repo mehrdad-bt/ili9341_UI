@@ -5,9 +5,8 @@
  *      Author: zbook
  */
 
-#ifndef ILI9341_H
-#define ILI9341_H
 
+#pragma once
 #include "stm32f4xx_hal.h"
 
 
@@ -115,6 +114,5 @@ void ILI9341_DrawWaveform(uint16_t x, uint16_t y, uint16_t width, uint16_t heigh
 void ILI9341_DrawWaveformDiff(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
                              const uint16_t *new_values, const uint16_t *old_values,
                              uint16_t num_points, uint16_t color, uint16_t bg_color);												 
-#endif
 
 

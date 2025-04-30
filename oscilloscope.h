@@ -1,6 +1,4 @@
-#ifndef OSCILLOSCOPE_H
-#define OSCILLOSCOPE_H
-
+#pragma once
 #include "stm32f4xx_hal.h"
 #include "buttons.h"
 
@@ -44,4 +42,4 @@ void Osc_AutoSet(void);
 float Process_ADC_Data(void);
 void TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 
-#endif // OSCILLOSCOPE_H
+
