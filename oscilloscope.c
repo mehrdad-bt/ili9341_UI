@@ -77,6 +77,7 @@ void Osc_Draw(void) {
             ILI9341_DrawString(20, 60, voltage_str, COLOR_YELLOW, current_bg_Color, 1);
             osc_state.prev_voltage = voltage;
         }
+			}
 
         // Update frequency text (new addition)
         static float prev_freq = 0;
@@ -119,7 +120,7 @@ void Osc_Draw(void) {
             }
         }
     }
-}
+
 
 
 void Osc_ButtonHandler(ButtonEventType event) {
