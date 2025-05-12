@@ -12,7 +12,11 @@ i also used this Cascode Drive circuit to control speed of Fan(resistor and indu
 
 
 
-https://github.com/user-attachments/assets/64060d6e-a8a2-479e-b9bf-c266be93a9e5
+
+
+https://github.com/user-attachments/assets/a62d5f65-7baa-4835-bb6b-a5b9bff04d9d
+
+
 
 
 
