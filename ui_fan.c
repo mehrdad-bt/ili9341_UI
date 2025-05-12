@@ -9,11 +9,11 @@
 #include <stdbool.h>
 #include "stm32f4xx_hal.h" 
 
-#define DUTY_STEP 14
+#define DUTY_STEP 2
 
 TIM_HandleTypeDef htim1;
 static uint8_t FanSpeed=0;
-volatile uint16_t pwm_duty=100;
+volatile uint16_t pwm_duty=10;
 
 static bool needs_full_redraw = true;
 
@@ -25,9 +25,9 @@ void FanPage_ButtonHandler(ButtonEventType event)
 	{
 		case BUTTON_EVENT_DOWN:
 
-		  pwm_duty = (pwm_duty < DUTY_STEP) ? 100 : pwm_duty - DUTY_STEP;
+		  pwm_duty = (pwm_duty < DUTY_STEP) ? 10 : pwm_duty - DUTY_STEP;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_duty);
-		if(FanSpeed < 7) FanSpeed++;
+		if(FanSpeed < 5) FanSpeed++;
 		
 		
 			
@@ -35,7 +35,7 @@ void FanPage_ButtonHandler(ButtonEventType event)
 				break;
 			
 		case BUTTON_EVENT_UP:
-			pwm_duty = (pwm_duty + DUTY_STEP) > 100 ? 100 : pwm_duty + DUTY_STEP;
+			pwm_duty = (pwm_duty + DUTY_STEP) > 10 ? 10 : pwm_duty + DUTY_STEP;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_duty);
 			if(FanSpeed>0) FanSpeed--;
 			UI_UpdateDisplay();
@@ -90,7 +90,7 @@ void FanPage_Draw(void)
     const uint16_t barY = 100;
     const uint16_t barWidth = 220;
     const uint16_t barHeight = 25;
-    const float segmentWidth = barWidth / 7.1;
+    const float segmentWidth = barWidth / 5.1;
     
     // Draw empty bar outline
     ILI9341_DrawRectangle(barX, barY, barWidth, barHeight, COLOR_WHITE);
