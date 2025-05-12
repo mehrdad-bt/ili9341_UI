@@ -50,17 +50,20 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-DMA_HandleTypeDef hdma_adc1;
-SPI_HandleTypeDef hspi1;
 extern ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
 extern I2C_HandleTypeDef hi2c1;
+
+SPI_HandleTypeDef hspi1;
+
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 
-/* Definitions for LEDTask */
-osThreadId_t FunctionsTaskHandle;
-const osThreadAttr_t FunctionsTask_attributes = {
-  .name = "FunctionsTask",
+/* Definitions for UITask */
+osThreadId_t UITaskHandle;
+const osThreadAttr_t UITask_attributes = {
+  .name = "UITask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -91,11 +94,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_I2C1_Init(void);
 static void MX_TIM2_Init(void);
-void StartFunctionsTask(void *argument);
+void StartUITask(void *argument);
 void StartButtonTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -139,16 +142,16 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_SPI1_Init();
-  MX_I2C1_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
+  MX_I2C1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	
 
   
 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);  // Start PWM
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 100);
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 10);
 ILI9341_Init(&hspi1, GPIOA, GPIO_PIN_2, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_0);
 UI_Init();
 	
@@ -183,8 +186,8 @@ UI_Init();
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of LEDTask */
-  FunctionsTaskHandle = osThreadNew(StartFunctionsTask, NULL, &FunctionsTask_attributes);
+  /* creation of UITask */
+  UITaskHandle = osThreadNew(StartUITask, NULL, &UITask_attributes);
 
   /* creation of ButtonTask */
   ButtonTaskHandle = osThreadNew(StartButtonTask, NULL, &ButtonTask_attributes);
@@ -410,9 +413,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 999+1;
+  htim1.Init.Prescaler = 8400-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 99+1;
+  htim1.Init.Period = 10-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -476,6 +479,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 0 */
 
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_IC_InitTypeDef sConfigIC = {0};
 
@@ -483,22 +487,31 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 42-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 4294967295;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_TIM_IC_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_ENABLE;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 0;
@@ -547,7 +560,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, RESET_Pin|DC_Pin|CS_Pin, GPIO_PIN_RESET);
@@ -572,12 +585,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LEFT_Pin RIGHT_Pin BACK_Pin */
-  GPIO_InitStruct.Pin = LEFT_Pin|RIGHT_Pin|BACK_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
@@ -587,12 +594,6 @@ static void MX_GPIO_Init(void)
 
   HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -618,14 +619,14 @@ void test_led(void)
 	
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartFunctionsTask */
+/* USER CODE BEGIN Header_StartUITask */
 /**
-  * @brief  Function implementing the LEDTask thread.
+  * @brief  Function implementing the UITask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartFunctionsTask */
-void StartFunctionsTask(void *argument)
+/* USER CODE END Header_StartUITask */
+void StartUITask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
