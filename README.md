@@ -7,9 +7,11 @@ this is cube configs
 i also used this Cascode Drive circuit to control speed of Fan(resistor and inductor and vdc is for modeling fan to see exact simulation results in psipce)
 
 
-<img width="530" alt="Screenshot 2025-05-12 104856" src="https://github.com/user-attachments/assets/74aa92e6-dd92-44a3-a5bb-1171a8c65dfe" />
+![1](https://github.com/user-attachments/assets/ec28ea58-5ba5-4f8a-b28d-4535d2d3386b)
 
 
+
+![2](https://github.com/user-attachments/assets/41010db3-06b6-49bf-a6c2-92e4cba7552c)
 
 
 
